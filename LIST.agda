@@ -1,4 +1,4 @@
--- Time-stamp: <2020-06-15 12:24:02 pierre>
+-- Time-stamp: <2020-07-03 19:21:53 pierre>
 {--------------------------------------------------------------------
    © Pierre Lescanne                          Agda version 2.6.1
  
@@ -39,6 +39,10 @@ hd (n ∷ _) = n
 map1ˢ : Sequence → Sequence
 map1ˢ [ n ]ˢ = [ suc n ]ˢ
 map1ˢ (n ∷ s) = suc n ∷ map1ˢ s
+
+lengthˢ : Sequence → ℕ
+lengthˢ [ _ ]ˢ = 1
+lengthˢ (_ ∷ s) = suc (lengthˢ s)
 
 --------------------
 -- predicate sorted
@@ -229,6 +233,10 @@ map1 : LIST → LIST
 map1 (inj₁ _) = []
 map1 (inj₂ s) = inj₂ (map1ˢ s)
 
+length : LIST → ℕ
+length (inj₁ _) = 0
+length (inj₂ s) = lengthˢ s
+
 data sortedL : LIST → Set where
   sortedL⊤ : sortedL (inj₁ tt)
   sortedLS : {s : Sequence} → sorted s → sortedL (inj₂ s)
@@ -252,24 +260,24 @@ split‡ (inj₂ (i ∷ s)) with split‡ (inj₂ s)
 ... | l = map (λ {(ℓ₁ , ℓ₂) → (i :: ℓ₁ , ℓ₂)}) l ++ map (λ {(ℓ₁ , ℓ₂) → (ℓ₁ , i :: ℓ₂)}) l
 
 -- all the indices of the LIST are strictly positive except the first one
-data is-0∷LIST≻0 : LIST → Set where
-  [0]≻0 : is-0∷LIST≻0 (inj₂ [ 0 ]ˢ)
-  0∷≻0 : {s : Sequence} → Seq≻0 s → is-0∷LIST≻0 (inj₂ (0 ∷ s))
+data _∈-LIST-ℕ⁺ : LIST → Set where
+  [0]≻0 : (inj₂ [ 0 ]ˢ) ∈-LIST-ℕ⁺
+  0∷≻0 : {s : Sequence} → Seq≻0 s → (inj₂ (0 ∷ s)) ∈-LIST-ℕ⁺
 
-is-0∷LIST≻0? : (ℓ : LIST) → Maybe (is-0∷LIST≻0 ℓ)
-is-0∷LIST≻0? (inj₂ [ 0 ]ˢ) = just [0]≻0 
-is-0∷LIST≻0? (inj₂ (0 ∷ s)) with Seq≻0? s
+∈-LIST-ℕ⁺? : (ℓ : LIST) → Maybe (ℓ ∈-LIST-ℕ⁺)
+∈-LIST-ℕ⁺? (inj₂ [ 0 ]ˢ) = just [0]≻0 
+∈-LIST-ℕ⁺? (inj₂ (0 ∷ s)) with Seq≻0? s
 ... | nothing = nothing
 ... | just p = just (0∷≻0 p)
-is-0∷LIST≻0? _ = nothing
+∈-LIST-ℕ⁺? _ = nothing
 
 -- down the indices
-↓ : {ℓ : LIST} → is-0∷LIST≻0 ℓ → LIST
+↓ : {ℓ : LIST} → ℓ ∈-LIST-ℕ⁺ → LIST
 ↓ [0]≻0 = []
 ↓ (0∷≻0 p) = inj₂ (⇓ p)
 
 -- ↓ preserves sortedness
-↓-sorted : {ℓ : LIST} → sortedL ℓ → (p : is-0∷LIST≻0 ℓ) → sortedL (↓ p)
+↓-sorted : {ℓ : LIST} → sortedL ℓ → (p : ℓ ∈-LIST-ℕ⁺) → sortedL (↓ p)
 ↓-sorted _ [0]≻0  = sortedL⊤
 ↓-sorted (sortedLS (sorted∷ _ pₛₒᵣ)) (0∷≻0 p) = sortedLS (⇓-sorted p pₛₒᵣ)
 

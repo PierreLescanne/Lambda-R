@@ -1,4 +1,4 @@
--- Time-stamp: <2020-05-20 15:25:38 pierre>
+-- Time-stamp: <2020-07-03 19:28:41 pierre>
 {--------------------------------------------------------------------
    © Pierre Lescanne                          Agda version 2.4.0.2
  
@@ -22,7 +22,7 @@ postulate
     (P : ℕ → Set) → (P 0) → (∀ n → (P n) → P (suc n)) → ∀ n → P n
 
 -------------------------
--- a sorting algorithm
+-- a genering sorting algorithm
 -------------------------
 sort : ℕ → (LIST → (LIST × LIST)) → LIST → LIST
 sort 0 _ _ = inj₁ tt
@@ -55,13 +55,13 @@ sort-sorts split = ℕ-induction (λ n → (ℓ : LIST) → sortedL (sort n spli
 -- insertion sort
 ----------------------
 
-insert-split : LIST → (LIST × LIST)
-insert-split (inj₁ tt) = inj₁ tt , inj₁ tt
-insert-split (inj₂ [ n ]ˢ) = inj₂ [ n ]ˢ , inj₁ tt
-insert-split (inj₂ (n₁ ∷ s)) = inj₂ [ n₁ ]ˢ , inj₂ s
+insertion-split : LIST → (LIST × LIST)
+insertion-split (inj₁ tt) = inj₁ tt , inj₁ tt
+insertion-split (inj₂ [ n ]ˢ) = inj₂ [ n ]ˢ , inj₁ tt
+insertion-split (inj₂ (n ∷ s)) = inj₂ [ n ]ˢ , inj₂ s
 
-insert-sort : LIST → LIST
-insert-sort ℓ = sort (length ℓ) insert-split ℓ
+insertion-sort : LIST → LIST
+insertion-sort ℓ = sort (length ℓ) insertion-split ℓ
 
 ----------------------
 -- merge sort

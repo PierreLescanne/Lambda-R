@@ -1,4 +1,4 @@
--- Time-stamp: <2020-06-21 21:45:38 pierre>
+-- Time-stamp: <2020-07-03 21:56:02 pierre>
 {--------------------------------------------------------------------
    © Pierre Lescanne                          Agda version 2.6.1
  
@@ -15,7 +15,6 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_; _≤_; _<_)
 open import Nat_complement
 open import Lambda_WITH_LIST
 open import LIST
-open import Is-lin
 open import Data.Sum using (_⊎_;[_,_]′;inj₁;inj₂)
 open import Data.Unit using (⊤;tt)
 open import Data.Maybe
