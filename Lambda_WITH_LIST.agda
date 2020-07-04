@@ -1,12 +1,8 @@
--- Time-stamp: <2020-07-03 21:54:31 pierre>
+-- Time-stamp: <2020-07-04 10:07:56 pierre>
 {--------------------------------------------------------------------
-   © Pierre Lescanne                          Agda version 2.6.1
+© Pierre Lescanne Pierre.Lescanne@ens-lyon.fr      Agda version 2.6.1
  
-                     DO NOT MODIFY THIS FILE
-
-                  Pleased do not modifiy this file.
-
- If you want to modify it send a mail to Pierre.Lescanne@ens-lyon.fr
+                    Lambda_WITH_LIST
  --------------------------------------------------------------------}
 module Lambda_WITH_LIST where
 
@@ -29,7 +25,7 @@ open import Data.Unit using (⊤;tt)
 -- ======================================================
 data Λin : (ℓ : LIST) → Set where
   dB : (k : ℕ) → Λin [ k ]
-  ƛ : {ℓ : LIST} → Λin ℓ → (p : ℓ ∈-LIST-ℕ⁺) → Λin (↓ p)
+  ƛ : {ℓ : LIST} → Λin ℓ → (p : ℓ ∈-0::LIST-ℕ⁺) → Λin (↓ p)
   _¤_ :  {ℓ₁ ℓ₂ : LIST} → Λin ℓ₁ → Λin ℓ₂ → Λin (ℓ₁ ‡ ℓ₂)
 -- =======================================================
 
@@ -41,11 +37,11 @@ data Λin : (ℓ : LIST) → Set where
 -- is-lin is a predicate which says the a given term is linear
 data is-lin : (t : Λ) → (ℓ : LIST) → Set where
   is-lin-dB : {k : ℕ} → is-lin (dB k) [ k ]
-  is-lin-ƛ : {t : Λ} → {ℓ : LIST} → is-lin t ℓ → (p : ℓ ∈-LIST-ℕ⁺) → is-lin (ƛ t) (↓ p)
+  is-lin-ƛ : {t : Λ} → {ℓ : LIST} → is-lin t ℓ → (p : ℓ ∈-0::LIST-ℕ⁺) → is-lin (ƛ t) (↓ p)
   is-lin-¤ : {t₁ t₂ : Λ} → {ℓ₁ ℓ₂ : LIST} → is-lin t₁ ℓ₁ → is-lin t₂ ℓ₂  → is-lin (t₁ ¤ t₂) (ℓ₁ ‡ ℓ₂)
 
 -- Is a given LIST linear ?
--- the implementation is limited LIST's of size at most 3 with indices 0, 1, 2, 
+-- the implementation is limited to LIST's of size at most 3 with indices 0, 1, 2, 
 is-lin? : (t : Λ) → (ℓ : LIST) → Maybe (is-lin t ℓ)
 is-lin-¤? : (t₁ t₂ : Λ) → (ℓ₁ ℓ₂ : LIST) → Maybe (is-lin (t₁ ¤ t₂) (ℓ₁ ‡ ℓ₂))
 

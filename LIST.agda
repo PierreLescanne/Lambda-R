@@ -1,12 +1,8 @@
--- Time-stamp: <2020-07-03 19:21:53 pierre>
+-- Time-stamp: <2020-07-04 10:08:43 pierre>
 {--------------------------------------------------------------------
-   © Pierre Lescanne                          Agda version 2.6.1
- 
-                     DO NOT MODIFY THIS FILE
+© Pierre Lescanne Pierre.Lescanne@ens-lyon.fr      Agda version 2.6.1
 
-                  Pleased do not modifiy this file.
-
- If you want to modify it send a mail to Pierre.Lescanne@ens-lyon.fr
+                                 LIST
  --------------------------------------------------------------------}
 
 module LIST where
@@ -260,24 +256,24 @@ split‡ (inj₂ (i ∷ s)) with split‡ (inj₂ s)
 ... | l = map (λ {(ℓ₁ , ℓ₂) → (i :: ℓ₁ , ℓ₂)}) l ++ map (λ {(ℓ₁ , ℓ₂) → (ℓ₁ , i :: ℓ₂)}) l
 
 -- all the indices of the LIST are strictly positive except the first one
-data _∈-LIST-ℕ⁺ : LIST → Set where
-  [0]≻0 : (inj₂ [ 0 ]ˢ) ∈-LIST-ℕ⁺
-  0∷≻0 : {s : Sequence} → Seq≻0 s → (inj₂ (0 ∷ s)) ∈-LIST-ℕ⁺
+data _∈-0::LIST-ℕ⁺ : LIST → Set where
+  [0]≻0 : (inj₂ [ 0 ]ˢ) ∈-0::LIST-ℕ⁺
+  0∷≻0 : {s : Sequence} → Seq≻0 s → (inj₂ (0 ∷ s)) ∈-0::LIST-ℕ⁺
 
-∈-LIST-ℕ⁺? : (ℓ : LIST) → Maybe (ℓ ∈-LIST-ℕ⁺)
-∈-LIST-ℕ⁺? (inj₂ [ 0 ]ˢ) = just [0]≻0 
-∈-LIST-ℕ⁺? (inj₂ (0 ∷ s)) with Seq≻0? s
+∈-0::LIST-ℕ⁺? : (ℓ : LIST) → Maybe (ℓ ∈-0::LIST-ℕ⁺)
+∈-0::LIST-ℕ⁺? (inj₂ [ 0 ]ˢ) = just [0]≻0 
+∈-0::LIST-ℕ⁺? (inj₂ (0 ∷ s)) with Seq≻0? s
 ... | nothing = nothing
 ... | just p = just (0∷≻0 p)
-∈-LIST-ℕ⁺? _ = nothing
+∈-0::LIST-ℕ⁺? _ = nothing
 
 -- down the indices
-↓ : {ℓ : LIST} → ℓ ∈-LIST-ℕ⁺ → LIST
+↓ : {ℓ : LIST} → ℓ ∈-0::LIST-ℕ⁺ → LIST
 ↓ [0]≻0 = []
 ↓ (0∷≻0 p) = inj₂ (⇓ p)
 
 -- ↓ preserves sortedness
-↓-sorted : {ℓ : LIST} → sortedL ℓ → (p : ℓ ∈-LIST-ℕ⁺) → sortedL (↓ p)
+↓-sorted : {ℓ : LIST} → sortedL ℓ → (p : ℓ ∈-0::LIST-ℕ⁺) → sortedL (↓ p)
 ↓-sorted _ [0]≻0  = sortedL⊤
 ↓-sorted (sortedLS (sorted∷ _ pₛₒᵣ)) (0∷≻0 p) = sortedLS (⇓-sorted p pₛₒᵣ)
 

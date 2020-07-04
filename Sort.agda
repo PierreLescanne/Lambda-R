@@ -1,12 +1,8 @@
--- Time-stamp: <2020-07-03 19:28:41 pierre>
+-- Time-stamp: <2020-07-04 10:09:51 pierre>
 {--------------------------------------------------------------------
-   © Pierre Lescanne                          Agda version 2.4.0.2
+© Pierre Lescanne Pierre.Lescanne@ens-lyon.fr      Agda version 2.6.1
  
-                     DO NOT MODIFY THIS FILE
-
-                  Pleased do not modifiy this file.
-
- If you want to modify it send a mail to Pierre.Lescanne@ens-lyon.fr
+                                 Sort
  --------------------------------------------------------------------}
 
 module Sort where
