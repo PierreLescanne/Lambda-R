@@ -1,12 +1,8 @@
--- Time-stamp: <2020-05-13 17:12:56 pierre>
+-- Time-stamp: <2020-10-15 09:59:10 pierre>
 {--------------------------------------------------------------------
-   © Pierre Lescanne                          Agda version 2.4.0.2
+   © Pierre Lescanne                          Agda version 2.6.1.1
  
-                     DO NOT MODIFY THIS FILE
-
-                  Pleased do not modifiy this file.
-
- If you want to modify it send a mail to Pierre.Lescanne@ens-lyon.fr
+                            Nat_complement
  --------------------------------------------------------------------}
 module Nat_complement where
 
@@ -55,6 +51,16 @@ x ≐ y = (P : _ → Set) → P x → P y
 ≐-subst P h = h P
 
 --- Relations on ℕ ---
+--- ≡ ---
+SM≡ : (m n : ℕ) → Maybe (m ≡ n) → Maybe ((suc m) ≡ (suc n))
+SM≡ m .m (just refl) = just refl
+SM≡ m n nothing = nothing
+
+_≡?_ : (m n : ℕ) → Maybe (m ≡ n)
+zero ≡? zero = just refl
+zero ≡? suc n = nothing
+suc m ≡? zero = nothing
+suc m ≡? suc n = SM≡ m n (m ≡? n) 
 -----------
 ---- ≺ ----
 -----------
@@ -66,14 +72,25 @@ data _≺_ : ℕ → ℕ → Set where
 inv-s≺s : {n m : ℕ} → suc n ≺ suc m → n ≺ m
 inv-s≺s (s≺s e) = e
 
+-- fact 1
 ≺suc : {i n : ℕ} → (i ≺ n) → i ≺ (suc n)
 ≺suc z≺s = z≺s
 ≺suc (s≺s p) = s≺s (≺suc p)
+
+-- fatc 2
+≺→0≺ : {i n : ℕ} → (i ≺ n) → 0 ≺ n
+≺→0≺ z≺s = z≺s
+≺→0≺ (s≺s p) = z≺s
 
 -- transitivity
 trans≺ : {n₁ n₂ n₃ : ℕ} → n₁ ≺ n₂ → n₂ ≺ n₃ → n₁ ≺ n₃
 trans≺ z≺s (s≺s _) = z≺s 
 trans≺ (s≺s p) (s≺s p')= s≺s (trans≺ p p')
+
+-- Maybe s≺s 
+S≺S : {n m : ℕ} → Maybe (n ≺ m) → Maybe (suc n ≺ suc m)
+S≺S nothing = nothing
+S≺S (just p) = just (s≺s p)
 
 -----------
 ---- ≼ ----
@@ -130,10 +147,6 @@ data _≠_ : ℕ → ℕ → Set where
   s≠z : {n : ℕ} → suc n ≠ zero
   s≠s : {n m : ℕ} → n ≠ m → suc n ≠ suc m
   
-S≺S : {n m : ℕ} → Maybe (n ≺ m) → Maybe (suc n ≺ suc m)
-S≺S nothing = nothing
-S≺S (just p) = just (s≺s p)
-
 -- given two naturals n and m, n ≺? m is maybe a proof of n ≺ m
 _≺?_ : (n m : ℕ) → Maybe (n ≺ m)
 _ ≺? 0 = nothing
@@ -173,10 +186,20 @@ _=̂?_ : (n m : ℕ) → Maybe (n =̂ m)
 (suc n) =̂? (suc m) | nothing = nothing
 (suc n) =̂? (suc m) | just p = just (s=̂s p )
 
+-- reflexivity of =̂
+ref=̂ : (n : ℕ) → n =̂ n
+ref=̂ 0 = z=̂z
+ref=̂ (suc n) = s=̂s (ref=̂ n)
+
 -- symmetry of =̂
 sym=̂ : {n m : ℕ} → n =̂ m → m =̂ n
 sym=̂ z=̂z =  z=̂z
 sym=̂ (s=̂s p) = s=̂s (sym=̂ p)
+
+-- transitivity of =̂
+trans=̂ : {n m p : ℕ} → n =̂ m → m =̂ p → n =̂ p
+trans=̂  z=̂z z=̂z = z=̂z
+trans=̂  (s=̂s p₁) (s=̂s p₂) = s=̂s (trans=̂ p₁ p₂)
 
 -- =̂ implies ≼
 =̂→≼ : {m n : ℕ} → m =̂ n → m ≼ n
@@ -198,6 +221,11 @@ trans2≼ (s≼s p) (s=̂s p') = s≼s (trans2≼ p p')
 ≺≼→≺ {0} {suc k} {suc n} _ _  = z≺s
 ≺≼→≺ (s≺s p) (s≼s p') = s≺s (≺≼→≺ p p')
 
+-- 3rd pseudo-transitivity of ≺
+≺=̂→≺ : {i k n : ℕ} → i ≺ k → k =̂ n → i ≺ n
+≺=̂→≺ {0} {suc k} {suc n} z≺s ref=̂ = z≺s
+≺=̂→≺ (s≺s p) (s=̂s p') = s≺s (≺=̂→≺ p p')
+
 -- totalness of ≺
 total≺ : (n m : ℕ) → n ≺ m ⊎ n =̂ m ⊎ m ≺ n
 total≺ 0 0 = inj₂ (inj₁ z=̂z)
@@ -214,6 +242,10 @@ total≺ (suc n) (suc m) = [ f≺ , [ f=̂ , f≻ ]′ ]′ (total≺ n m) where
   f≻ p = inj₂ (inj₂ (s≺s p))
 
 -- ==================== on Lists ====================
+data _isIn_ : {A : Set} → A → List A → Set where
+  in₁ : {A : Set} → {a : A} → {l : List A} → a isIn (a :: l)
+  in₂ : {A : Set} → {a₁ a₂ : A} → {l : List A} → a₁ isIn l → a₁ isIn (a₂ :: l)
+
 -- two different lists
 data _≠α_ : List Bool → List Bool → Set where
   ε≠∷ : (b : Bool) → (α : List Bool) → ε ≠α (b :: α) 
