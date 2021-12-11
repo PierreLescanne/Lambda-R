@@ -11,3 +11,4 @@ Currently there are 7 files:
 * Is-lin.agda : a apendix of the previous file (a test on linearity of plain lambda-terms) 
 * Sort.agda : aplication of LIST to sorting algorithms (insertion sort and merge sort) 
 * Examples_for_Lambda_WITH_LIST.agda : some exmaples
+*  L-types-for-resource-awarness.pdf : a paper presenting the theory (with better presentaion of the programs than in the arXiv paper)
