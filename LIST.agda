@@ -1,7 +1,7 @@
--- Time-stamp: <2020-07-04 10:08:43 pierre>
+-- Time-stamp: <2023-04-21 10:23:23 pierre>
 {--------------------------------------------------------------------
-© Pierre Lescanne Pierre.Lescanne@ens-lyon.fr      Agda version 2.6.1
-
+   © Pierre Lescanne                          Agda version 2.6.1
+ 
                                  LIST
  --------------------------------------------------------------------}
 
@@ -172,41 +172,14 @@ sorted→≻0 p0≺ (sorted∷ p≺ pₛ) = lemma' p0≺ (sorted→≻0 (≺≼�
 ----------------------
 _‡ˢ_ : Sequence → Sequence → Sequence
 [ n ]ˢ ‡ˢ s = insert n s
-s ‡ˢ [ n ]ˢ = insert n s
-(n₁ ∷ s₁) ‡ˢ (n₂ ∷ s₂) with total≼ n₁ n₂
-... | inj₁ _ = n₁ ∷ (s₁ ‡ˢ (n₂ ∷ s₂)) -- n₁ ≼ n₂
-... | inj₂ _ = n₂ ∷ ((n₁ ∷ s₁) ‡ˢ s₂)  -- n₂ ≼ n₁
-
+(n₁ ∷ s₁) ‡ˢ s = insert n₁ (s₁ ‡ˢ s)
 
 -- =-=-=-=-=-=-=-=-=-=-=-=-
 --  ‡ˢ preserves sortedness
 -- =-=-=-=-=-=-=-=-=-=-=-=-
--- lemmas
-hd-lemma‡ˢ : {i n : ℕ} → (s₁ s₂ : Sequence) → i ≼ hd s₁ → i ≼ hd s₂ → i ≼ hd (s₁ ‡ˢ s₂)
-hd-lemma‡ˢ {i} {n} [ k ]ˢ s₂ p₁ p₂ = hd-lemma {i} {k} {s₂} p₁ p₂
-hd-lemma‡ˢ {i} {n} (n₁ ∷ s₁) [ k ]ˢ p₁ p₂ = hd-lemma {i} {k} {n₁ ∷ s₁} p₂ p₁ 
-hd-lemma‡ˢ (n₁ ∷ s₁) (n₂ ∷ s₂) p₁ p₂ with total≼ n₁ n₂
-... | inj₁ _ = p₁
-... | inj₂ _ = p₂
-
-‡ˢ-sorted-Ind[]left : (n : ℕ) → (s : Sequence)  → sorted [ n ]ˢ → sorted s → sorted ([ n ]ˢ ‡ˢ s)
-‡ˢ-sorted-Ind[]left n s _ p = InsSort s p n
-
-‡ˢ-sorted-Ind[]right : (n m : ℕ) → (s : Sequence) → sorted (m ∷ s) → sorted [ n ]ˢ → sorted ((m ∷ s) ‡ˢ [ n ]ˢ)
-‡ˢ-sorted-Ind[]right n m s p _ = InsSort (m ∷ s) p n 
-
-‡ˢ-sorted-Ind : (n₁ n₂ : ℕ) → (s₁ s₂ : Sequence) →
-  (sorted s₁ → sorted (n₂ ∷ s₂) → sorted (s₁ ‡ˢ (n₂ ∷ s₂))) → 
-  (sorted (n₁ ∷ s₁) → sorted s₂ → sorted ((n₁ ∷ s₁) ‡ˢ s₂)) →
-  sorted (n₁ ∷ s₁) → sorted (n₂ ∷ s₂) → sorted ((n₁ ∷ s₁) ‡ˢ (n₂ ∷ s₂))
-‡ˢ-sorted-Ind n₁ n₂ s₁ s₂ p₁ p₂ p₃ p₄ with total≼ n₁ n₂
-...| inj₁ p≼ = sorted∷ (hd-lemma‡ˢ {n₁} {n₂}  s₁ (n₂ ∷ s₂) (sorted-inv₁ p₃) (trans≼ p≼ (=̂→≼ (η-hd {n₂} {s₂}))))  (p₁ (sorted-inv₂ p₃)  p₄)
-...| inj₂ p≽ = sorted∷ (hd-lemma‡ˢ {n₂} {n₂} (n₁ ∷ s₁) s₂ (sorted-inv₁ (sorted∷ p≽ p₃)) (sorted-inv₁ p₄)) (p₂ p₃ (sorted-inv₂ p₄))
-
--- preservation of sortedness by ‡ˢ
-
 ‡ˢ-sorted : (s₁ s₂ : Sequence) → sorted s₁ → sorted s₂ → sorted (s₁ ‡ˢ s₂)
-‡ˢ-sorted s₁ s₂ = pair-Sequence-induction (λ s₁ s₂ → sorted s₁ → sorted s₂ → sorted (s₁ ‡ˢ s₂))  ‡ˢ-sorted-Ind[]left ‡ˢ-sorted-Ind[]right ‡ˢ-sorted-Ind  s₁ s₂
+‡ˢ-sorted [ n₁ ]ˢ s₂ sorted1 p =  InsSort s₂ p n₁
+‡ˢ-sorted (n₁ ∷ s₁) s₂ p₁ p₂ = InsSort (s₁ ‡ˢ s₂) (‡ˢ-sorted s₁ s₂ (sorted-inv₂ p₁) p₂) n₁
 
 -- =============
 -- LIST as a sum
@@ -237,6 +210,10 @@ data sortedL : LIST → Set where
   sortedL⊤ : sortedL (inj₁ tt)
   sortedLS : {s : Sequence} → sorted s → sortedL (inj₂ s)
 
+--------------------
+-- merge two lists
+--------------------
+
 _‡_ : LIST → LIST → LIST
 (inj₁ tt) ‡ ℓ = ℓ
 (inj₂ s) ‡ (inj₁ tt) = inj₂ s
@@ -247,13 +224,6 @@ _‡_ : LIST → LIST → LIST
 ‡-sorted (inj₁ tt) _ _ p₂ = p₂
 ‡-sorted (inj₂ _) (inj₁ tt) p₁ _ = p₁
 ‡-sorted (inj₂ s₁) (inj₂ s₂) (sortedLS p₁) (sortedLS p₂) = sortedLS ((‡ˢ-sorted s₁ s₂) p₁ p₂)
-
--- splitting a LIST
-split‡ : (ℓ : LIST) → List (LIST × LIST)
-split‡ (inj₁ tt) = ε
-split‡ (inj₂ [ i ]ˢ) = ([ i ] , []) :l: ([] , [ i ]) :l: ε
-split‡ (inj₂ (i ∷ s)) with split‡ (inj₂ s)
-... | l = map (λ {(ℓ₁ , ℓ₂) → (i :: ℓ₁ , ℓ₂)}) l ++ map (λ {(ℓ₁ , ℓ₂) → (ℓ₁ , i :: ℓ₂)}) l
 
 -- all the indices of the LIST are strictly positive except the first one
 data _∈-0::LIST-ℕ⁺ : LIST → Set where
