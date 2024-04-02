@@ -1,4 +1,4 @@
--- Time-stamp: <2020-06-12 14:09:04 pierre>
+-- Time-stamp: <2024-04-01 21:56:58 pierre>
 module Lambda where
 
 -- open import LinearLambda_R_dB 
@@ -17,19 +17,21 @@ data Λ : Set where
   ƛ : (t : Λ) → Λ
 
 -- ========== Linear lambda terms ==========
--- "n" is the openedness. If openedness is 0, then the terms are closed
+-- "n" is the openedness. If then openedness is 0, then the terms are closed
 mutual 
   data LinΛ : (n : ℕ) → Set where
     dB : (n : ℕ) → (k : ℕ) → (k ≺ n) → LinΛ n
     _¤_ : {n : ℕ} → LinΛ n → LinΛ n → LinΛ n
     ƛ : {n : ℕ} → (t : LinΛ (suc n)) → (0 E! t) → LinΛ n
 
+-- "i E! t" means: i occurs once in t
   data  _E!_ : {n : ℕ} → (i : ℕ) → LinΛ n → Set where
    E!DB : {n i k : ℕ} → (p : k ≺ n) → (i =̂ k) → i E! (dB n k p)
    E!¤L : {n i : ℕ} → {t₁ t₂ : LinΛ n} → i E! t₁ → i ¬E t₂ → i E! (t₁ ¤ t₂)
    E!¤R : {n i : ℕ} → {t₁ t₂ : LinΛ n} → i ¬E t₁ → i E! t₂ → i E! (t₁ ¤ t₂)
    E!ƛ :  {n i : ℕ} → {t : LinΛ (suc n)} → {p : 0 E! t} → suc i E! t → i E! (ƛ t p)
 
+-- "i ¬E t" means: i does not occur in t.
   data _¬E_ : {n : ℕ} → (i : ℕ) → LinΛ n → Set where
    ¬EDB : {n i k : ℕ} → (i ≠ k) → (p : k ≺ n) → i ¬E (dB n k p)
    ¬E¤ : {n i : ℕ} → {t₁ t₂ : LinΛ n} → i ¬E t₁ → i ¬E t₂ → i ¬E (t₁ ¤ t₂)
@@ -59,11 +61,6 @@ i ¬E? (t₁ ¤ t₂) = case¤ (i ¬E? t₁) (i ¬E? t₂)
                  case¤ _ nothing = nothing
                  case¤ (just p₁) (just p₂) = just (¬E¤ p₁ p₂)
                
--- a generic function which I did not find in Maybe.agda
-Mb→ : {A B : Set} → Maybe (A → B) → Maybe A → Maybe B
-Mb→ nothing = λ _ → nothing 
-Mb→ (just f) = map f
-
 -- maybe a proof of i E! t ?
 _E!?_ :  {n : ℕ} → (i : ℕ) → (t : LinΛ n) → Maybe (i E! t)
 i E!? (dB n k p) = caseDB (i =̂? k)
@@ -84,8 +81,8 @@ i E!? (t₁ ¤ t₂) = choose (i ¬E? t₁) -- or  (i ¬E? t₂)
                 case¤iE!t₂ (just p)= just (λ z → E!¤R z p)
 
                 choose : Maybe (i ¬E t₁) → Maybe (i E! (t₁ ¤ t₂))
-                choose nothing = Mb→ (case¤iE!t₁ (i E!? t₁)) (i ¬E? t₂)
-                choose (just _) = Mb→ (case¤iE!t₂ (i E!? t₂)) (i ¬E? t₁)
+                choose nothing = ap (case¤iE!t₁ (i E!? t₁)) (i ¬E? t₂)
+                choose (just _) = ap (case¤iE!t₂ (i E!? t₂)) (i ¬E? t₁)
 
 -- a translation from Λ terms to closed linear lambda-terms
 Λ→LinΛ : {n : ℕ} → Λ →  Maybe (LinΛ n)
