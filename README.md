@@ -6,10 +6,9 @@ Currently there are 9 files:
 
 * LambdaL.agda : a file specifically for a submission to [Formal Aspects of Computing](https://dl.acm.org/journal/fac)
 * Examples_for_LambdaL : a set of examples for LambdaL.agda
-  
+* -----------------------
 * Nat_complement.agda : complements on the naturals
 * Lambda.agda : plain lambda calculus
-* --------------
 * LIST.agda : a specific implementation of lists, targeted toward sorted lists.
 * Lambda_WITH_LIST.agda : the implemenation of linear lambda-calulus.
 * Is-lin.agda : a apendix of the previous file (a test on linearity of plain lambda-terms) 
