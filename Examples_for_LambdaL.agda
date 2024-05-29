@@ -1,47 +1,55 @@
--- Time-stamp: <2024-05-29 17:05:41 pierre>
+-- Time-stamp: <2024-05-29 17:38:47 pierre>
 module Examples_for_LambdaL where
 
 open import LambdaL
 open import Data.Nat using (ℕ; zero; suc)
 open import Data.List using (List;[_];_∷_) renaming ([] to ε)
 
-i' : ΛL ε
-i' = ƛ (dB 0) okε
+-- open terms
+-- Beware: names (identifiers) are just a help, no imposed constraint
+-- you can call them foo or bar
+λx·x : ΛL ε
+λx·x = ƛ (dB 0) okε
 
--- λxyzu .xyzu.  
 xyzu : ΛL (0 ∷ (1 ∷ (2 ∷ [ 3 ])))
 xyzu  = ((dB 0 ¤ dB 1) ¤ dB 2) ¤ dB 3
 
-λxyzu : ΛL (0 ∷ (1 ∷ [ 2 ]))
-λxyzu = ƛ xyzu okε̸
+λx·xyzu : ΛL (0 ∷ (1 ∷ [ 2 ]))
+λx·xyzu = ƛ xyzu okε̸
 
-λλxyzu : ΛL (0 ∷ [ 1 ])
-λλxyzu = ƛ (ƛ xyzu okε̸) okε̸
+λxy·xyzu : ΛL (0 ∷ [ 1 ])
+λxy·xyzu = ƛ (ƛ xyzu okε̸) okε̸
 
-λλλxyzu : ΛL [ 0 ]
-λλλxyzu = ƛ (ƛ (ƛ xyzu okε̸) okε̸) okε̸
+λxyz·xyzu : ΛL [ 0 ]
+λxyz·xyzu = ƛ (ƛ (ƛ xyzu okε̸) okε̸) okε̸
 
-λλλλxyzu : ΛL ε
-λλλλxyzu = ƛ (ƛ (ƛ (ƛ xyzu okε̸) okε̸) okε̸) okε
 
--- v1
-v1 : ΛL ε
-v1 = ƛ (ƛ (dB 0 ¤ dB 1) okε̸) okε
+-- several closed terms
 
-v1' : ΛL ε
-v1' = ƛ (ƛ (dB 1 ¤ dB 0) okε̸) okε
+λxy·xy : ΛL ε
+λxy·xy = ƛ (ƛ (dB 0 ¤ dB 1) okε̸) okε
 
-v4' : ΛL (0 ∷ 1 ∷ (2 ∷ ε))
-v4' = (dB 2 ¤ dB 1) ¤ dB 0
+λxy·yx : ΛL ε
+λxy·yx  = ƛ (ƛ (dB 1 ¤ dB 0) okε̸) okε
 
-v4'' : ΛL ((2 ∷ ε) ‡ (1 ∷ ε))
-v4'' = dB 2 ¤ dB 1
+λxyzu·xyzu : ΛL ε
+λxyzu·xyzu = ƛ (ƛ (ƛ (ƛ xyzu okε̸) okε̸) okε̸) okε
 
-db2 : ΛL (2 ∷ ε)
-db2 = dB 2
+-- several open terms
 
-db1 : ΛL (1 ∷ ε)
-db1 = dB 1
+λxyz·zyx : ΛL (0 ∷ 1 ∷ (2 ∷ ε))
+λxyz·zyx = (dB 2 ¤ dB 1) ¤ dB 0
+
+λx·zy : ΛL ((2 ∷ ε) ‡ (1 ∷ ε))
+λx·zy = dB 2 ¤ dB 1
+
+λxy·z : ΛL (2 ∷ ε)
+λxy·z = dB 2
+
+λx·y : ΛL (1 ∷ ε)
+λx·y = dB 1
+
+-- more complex ones (for fun)
 
 v4 : ΛL ε
 v4 = ƛ (ƛ (ƛ ((dB 2 ¤ dB 1) ¤ dB 0) okε̸) okε̸) okε
